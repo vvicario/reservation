@@ -1,4 +1,4 @@
-package reservation.reservation;
+package reservation;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,12 +12,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+
 import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration
-public class ReservationApplicationTests implements ApplicationContextAware, InitializingBean {
+public class ReservationApplicationTests extends TestUtils implements ApplicationContextAware, InitializingBean {
 
 	@Configuration
 	public static class SimpleConfiguration {}

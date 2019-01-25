@@ -1,6 +1,6 @@
 package reservation.validators;
 
-import reservation.dto.ReservationDTO;
+import reservation.TestUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -8,7 +8,7 @@ import org.junit.rules.ExpectedException;
 
 import java.time.LocalDate;
 
-public class ReservationValidatorTest {
+public class ReservationValidatorTest extends TestUtils {
 
     private ReservationValidator validator;
 
@@ -26,16 +26,16 @@ public class ReservationValidatorTest {
         LocalDate departureDate = LocalDate.now().plusDays(1);
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(ReservationValidator.ERROR_MESSAGE_MINIMUM_DAYS);
-        validator.validate(createReservationDTO(arrivalDate, departureDate));
+        validator.validate(createReservation(arrivalDate, departureDate));
     }
 
     @Test
     public void testValidateDepartureDateLessThan1Month() {
-        LocalDate arrivalDate = LocalDate.of(2019,1,25);
-        LocalDate departureDate = LocalDate.of(2019,2,24);
+        LocalDate arrivalDate = LocalDate.now().plusDays(2);
+        LocalDate departureDate = LocalDate.now().plusDays(32);
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(ReservationValidator.ERROR_MESSAGE_MAXIMUM_DAYS_IN_ADVANCE);
-        validator.validate(createReservationDTO(arrivalDate, departureDate));
+        validator.validate(createReservation(arrivalDate, departureDate));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class ReservationValidatorTest {
         LocalDate departureDate = LocalDate.now().plusDays(1);
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(ReservationValidator.ERROR_MESSAGE_DEPARTURE_DATE);
-        validator.validate(createReservationDTO(arrivalDate, departureDate));
+        validator.validate(createReservation(arrivalDate, departureDate));
     }
 
     @Test
@@ -53,14 +53,14 @@ public class ReservationValidatorTest {
         LocalDate departureDate = LocalDate.now().plusDays(7);
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage(ReservationValidator.ERROR_MESSAGE_MAXIMUM_DAYS);
-        validator.validate(createReservationDTO(arrivalDate, departureDate));
+        validator.validate(createReservation(arrivalDate, departureDate));
     }
 
     @Test
     public void testValidateSuccess() {
         LocalDate arrivalDate = LocalDate.now().plusDays(3);
         LocalDate departureDate = LocalDate.now().plusDays(5);
-        validator.validate(createReservationDTO(arrivalDate, departureDate));
+        validator.validate(createReservation(arrivalDate, departureDate));
     }
 
     @Test
@@ -81,10 +81,4 @@ public class ReservationValidatorTest {
         validator.validateDateRange(arrivalDate, departureDate);
     }
 
-    private ReservationDTO createReservationDTO(LocalDate arrivalDate, LocalDate departureDate){
-        ReservationDTO reservation = new ReservationDTO();
-        reservation.setArrivalDate(arrivalDate);
-        reservation.setDepartureDate(departureDate);
-        return reservation;
-    }
 }

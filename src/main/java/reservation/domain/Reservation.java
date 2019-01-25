@@ -7,8 +7,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.LockModeType;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Version;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -17,10 +19,16 @@ import java.time.LocalDate;
  */
 @Entity
 // EndA <= StartB or StartA >= EndB
-@NamedQuery(name = "Reservation.checkForDateRangeOverlap",
-        query = "select count(r.id) from Reservation r where r.departureDate >= :arrivalDate or " +
-                "r.arrivalDate <= :departureDate ",
-        lockMode = LockModeType.WRITE)
+@NamedQueries({
+        @NamedQuery(name = "Reservation.checkForDateRangeOverlap",
+                query = "select count(r.id) from Reservation r where r.departureDate >= :arrivalDate or " +
+                        "r.arrivalDate <= :departureDate ",
+                lockMode = LockModeType.WRITE),
+        @NamedQuery(name = "Reservation.checkForDateRangeOverlapUpdate",
+                query = "select count(r.id) from Reservation r where r.identifier != :identifier and (r.departureDate >= :arrivalDate or " +
+                        "r.arrivalDate <= :departureDate) ",
+                lockMode = LockModeType.WRITE)
+})
 public class Reservation {
 
     @Id
@@ -28,8 +36,11 @@ public class Reservation {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    @Email
+    private String userEmail;
+
+    @NotNull
+    private String userFullName;
 
     @NotNull
     private LocalDate arrivalDate;
@@ -42,14 +53,15 @@ public class Reservation {
     @Version
     private Integer version;
 
-    protected Reservation() {
+    public Reservation() {
 
     }
 
-    public Reservation(LocalDate arrivalDate, LocalDate departureDate, User user, String identifier) {
+    public Reservation(LocalDate arrivalDate, LocalDate departureDate, String userEmail, String userFullName, String identifier) {
         this.arrivalDate = arrivalDate;
         this.departureDate = departureDate;
-        this.user = user;
+        this.userEmail = userEmail;
+        this.userFullName = userFullName;
         this.identifier = identifier;
     }
 
@@ -59,14 +71,6 @@ public class Reservation {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public LocalDate getArrivalDate() {
@@ -99,5 +103,21 @@ public class Reservation {
 
     public void setVersion(Integer version) {
         this.version = version;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public String getUserFullName() {
+        return userFullName;
+    }
+
+    public void setUserFullName(String userFullName) {
+        this.userFullName = userFullName;
     }
 }

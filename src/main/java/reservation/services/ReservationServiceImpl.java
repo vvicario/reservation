@@ -1,8 +1,7 @@
 package reservation.services;
 
+import org.apache.commons.lang.StringUtils;
 import reservation.domain.Reservation;
-import reservation.domain.User;
-import reservation.dto.ReservationDTO;
 import reservation.repository.ReservationRepository;
 import reservation.util.Utils;
 import reservation.validators.ReservationValidator;
@@ -19,6 +18,7 @@ import javax.persistence.OptimisticLockException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -36,23 +36,14 @@ public class ReservationServiceImpl implements ReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    @Autowired
-    private UserService userService;
-
-    private static final Integer CANT_DEFAULT_MONTH = 1;
-
     private static final Logger log = LoggerFactory.getLogger(ReservationServiceImpl.class);
 
-    @Async
     @Transactional
     @Override
-    public CompletableFuture<Reservation> create(@Valid ReservationDTO reservationDTO) throws InterruptedException {
-        User user = getUser(reservationDTO);
-        Reservation reservation = new Reservation(
-                reservationDTO.getArrivalDate(),
-                reservationDTO.getDepartureDate(),
-                user,
-                RandomStringUtils.random(8, true, true));
+    @Async
+    public CompletableFuture<Reservation> create(@Valid Reservation reservation) throws InterruptedException {
+
+        reservation.setIdentifier(RandomStringUtils.random(8, true, true));
         try {
             if (!isOverlapping(reservation)) {
                 reservationRepository.save(reservation);
@@ -65,16 +56,17 @@ public class ReservationServiceImpl implements ReservationService {
         return CompletableFuture.completedFuture(reservation);
     }
 
-    @Async
     @Override
-    public CompletableFuture<Reservation> update(String identifier, @Valid ReservationDTO reservationDTO) throws NotFoundException, InterruptedException {
-        validator.validate(reservationDTO);
-        Reservation reservation = reservationRepository.findByIdentifier(identifier);
-        if(reservation == null) {
+    @Transactional
+    public CompletableFuture<Reservation> update(String identifier, @Valid Reservation reservation) throws NotFoundException, InterruptedException {
+        validator.validate(reservation);
+        Reservation existentReservation = reservationRepository.findByIdentifier(identifier);
+        if(existentReservation == null) {
             throwNotFoundException();
         }
         try {
-            if (!isOverlapping(reservation)) {
+            if (!isOverlappingUpdate(reservation)) {
+                reservation.setId(existentReservation.getId());
                 reservationRepository.save(reservation);
             } else {
                 throwConcurrentModificationException();
@@ -87,16 +79,19 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Async
     @Override
-    public CompletableFuture<List<LocalDate>> findAvailableDatesByRangeDates(LocalDate fromDate, LocalDate toDate){
-        validator.validateDateRange(fromDate, toDate);
-        if(toDate == null) toDate =  LocalDate.now().plusMonths(CANT_DEFAULT_MONTH);
-        List<LocalDate> availableDates = Utils.getDatesBetween(fromDate, toDate);
+    public CompletableFuture<List<LocalDate>> findAvailableDatesByRangeDates(String fromDate, String toDate){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate from = StringUtils.isEmpty(fromDate) ? LocalDate.now() : LocalDate.parse(fromDate, formatter);
+        LocalDate to = StringUtils.isEmpty(toDate) ? LocalDate.now().plusMonths(1) : LocalDate.parse(toDate, formatter);
+        validator.validateDateRange(from, to);
+        List<LocalDate> availableDates = Utils.getDatesBetween(from, to);
         List<Reservation> reservations = reservationRepository.
-                findAllByArrivalDateGreaterThanEqualAndDepartureDateLessThanEqual(fromDate, toDate);
+                findAllByArrivalDateGreaterThanEqualAndDepartureDateLessThanEqual(from, to);
         List<LocalDate> existentReservations = new ArrayList<>();
         if(!CollectionUtils.isEmpty(reservations)) {
             reservations.forEach(reservation ->
-                existentReservations.addAll(Utils.getDatesBetween(reservation.getArrivalDate(), reservation.getDepartureDate()))
+                    // minus 1 becasuse the departure day will be free after 12
+                existentReservations.addAll(Utils.getDatesBetween(reservation.getArrivalDate(), reservation.getDepartureDate().minusDays(1)))
             );
         }
         availableDates.removeAll(existentReservations);
@@ -113,19 +108,26 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.delete(reservation);
     }
 
+    @Async
+    @Override
+    public CompletableFuture<Reservation>  findReservationByIdentifier(String identifier) throws NotFoundException {
+        Reservation reservation = reservationRepository.findByIdentifier(identifier);
+        if(reservation == null) {
+            throwNotFoundException();
+        }
+        return CompletableFuture.completedFuture(reservationRepository.findByIdentifier(identifier));
+    }
+
     private boolean isOverlapping(Reservation reservation) {
         return reservationRepository.checkForDateRangeOverlap(
                 reservation.getArrivalDate(),
                 reservation.getDepartureDate()) != 0;
     }
 
-    private User getUser(ReservationDTO reservationDTO) {
-        User user = userService.findUserByEmail(reservationDTO.getEmail());
-        if (user == null) {
-            user = new User(reservationDTO.getFullName(), reservationDTO.getEmail());
-            userService.saveUser(user);
-        }
-        return user;
+    private boolean isOverlappingUpdate(Reservation reservation) {
+        return reservationRepository.checkForDateRangeOverlapUpdate(
+                reservation.getArrivalDate(),
+                reservation.getDepartureDate(), reservation.getIdentifier()) != 0;
     }
 
     private void throwConcurrentModificationException() {

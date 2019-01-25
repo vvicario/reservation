@@ -1,7 +1,7 @@
 package reservation.validators;
 
-import reservation.dto.ReservationDTO;
 import org.springframework.stereotype.Component;
+import reservation.domain.Reservation;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -31,18 +31,15 @@ public class ReservationValidator {
 
     public void validate(Object obj) {
 
-        ReservationDTO reservationDTO = (ReservationDTO) obj;
-
+        Reservation reservationDTO = (Reservation) obj;
         // The reservation can be reserved minimum 1 day(s) ahead of arrival
         if (reservationDTO.getArrivalDate().isBefore(LocalDate.now().plusDays(MIN_RESERVATION_DATES))) {
             throwIllegalArgumentException(ERROR_MESSAGE_MINIMUM_DAYS);
         }
-
         // The reservation can be reserved MAX 1 month in advance
         if (reservationDTO.getDepartureDate().isAfter(LocalDate.now().plusMonths(1))) {
             throwIllegalArgumentException(ERROR_MESSAGE_MAXIMUM_DAYS_IN_ADVANCE);
         }
-
         // arrival date should be greater than departure date
         if (reservationDTO.getArrivalDate().isAfter(reservationDTO.getDepartureDate())) {
             throwIllegalArgumentException(ERROR_MESSAGE_DEPARTURE_DATE);
@@ -67,5 +64,4 @@ public class ReservationValidator {
     private void throwIllegalArgumentException(String message) {
         throw new IllegalArgumentException(message);
     }
-
 }
