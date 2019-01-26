@@ -4,14 +4,12 @@
 
 * It receives the following JSON:
 
-`
-    {
+  {
         "arrivalDate": "2019-02-16",
         "departureDate": "2019-02-17",
         "email":"test@test.com",
         "fullName": "Veronica Vicario"
-    }
-`
+  }
 
 It returns a reservation identifier in the location header
 # GET reservation/available
