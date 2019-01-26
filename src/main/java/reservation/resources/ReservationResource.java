@@ -40,6 +40,13 @@ public class ReservationResource {
     @Autowired
     private ReservationValidator validator;
 
+    /**
+     * Create a reservation for the specified information
+     * @param reservation
+     * @param ucb
+     * @return
+     * @throws Exception
+     */
     @PostMapping
     public ResponseEntity create(@RequestBody @Valid Reservation reservation, UriComponentsBuilder ucb) throws Exception {
         validator.validate(reservation);
@@ -49,6 +56,13 @@ public class ReservationResource {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Get reservation availability from today to one month or for the specified range of dates
+     * @param from
+     * @param to
+     * @return
+     * @throws Exception
+     */
     @GetMapping(value = "/available")
     public ResponseEntity<List<LocalDate>> findAvailableReservationDatesByRangeDates(@RequestParam(required=false) @DateTimeFormat(pattern = "yyyy-MM-dd") String from,
                                                                                      @RequestParam(required=false) @DateTimeFormat(pattern = "yyyy-MM-dd") String to) throws Exception {
@@ -57,7 +71,12 @@ public class ReservationResource {
         return new ResponseEntity<>(availableDates.get(), HttpStatus.OK);
     }
 
-
+    /**
+     * Return if exists reservation for the specified identifier or not found if it does not exists
+     * @param identifier
+     * @return
+     * @throws Exception
+     */
     @GetMapping(value = "/{identifier}")
     public ResponseEntity<Reservation> findReservation(@PathVariable("identifier") String identifier) throws Exception {
 
@@ -65,12 +84,27 @@ public class ReservationResource {
         return ResponseEntity.ok(reservation.get());
     }
 
+    /**
+     * Remove if exists reservation for the specified identifier
+     * @param identifier
+     * @return
+     * @throws NotFoundException
+     */
     @DeleteMapping(value = "/{identifier}")
     public ResponseEntity<String> delete(@PathVariable("identifier") String identifier) throws NotFoundException {
         reservationService.delete(identifier);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Update with the provided information, reservation with the specified identifier
+     * @param identifier
+     * @param reservation
+     * @return
+     * @throws NotFoundException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
     @PutMapping(value = "/{identifier}")
     public ResponseEntity<Reservation> update(@PathVariable("identifier") String identifier, @RequestBody @Valid Reservation reservation) throws NotFoundException, InterruptedException, ExecutionException {
         return ResponseEntity.ok(reservationService.update(identifier, reservation).get());
