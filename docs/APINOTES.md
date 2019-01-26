@@ -13,7 +13,7 @@
 
 It returns a reservation identifier in the location header
 # GET reservation/available
-It has two optionals parameters, from and to, and must be send with the folowign format: yyyy-MM-dd
+It has two optionals parameters, from and to, and must be send with the followign format: yyyy-MM-dd
 Example:
 
 * reservation/available?from=2019-02-16&to=2019-02-28
