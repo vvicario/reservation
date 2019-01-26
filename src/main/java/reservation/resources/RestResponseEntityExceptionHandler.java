@@ -1,6 +1,5 @@
 package reservation.resources;
 
-import org.springframework.web.bind.annotation.ResponseStatus;
 import reservation.dto.ApiError;
 import javassist.NotFoundException;
 import org.slf4j.Logger;
@@ -80,13 +79,14 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
 
-    public void handleUncaughtException(
+    public ResponseEntity<Object> handleUncaughtException(
             Throwable throwable, Method method, Object... obj) {
 
-        System.out.println("Exception message - " + throwable.getMessage());
-        System.out.println("Method name - " + method.getName());
-        for (Object param : obj) {
-            System.out.println("Parameter value - " + param);
-        }
+        log.error("Uncaught error - ", throwable);
+        ApiError apiError =
+                new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, throwable.getMessage());
+        return new ResponseEntity<>(
+                apiError, new HttpHeaders(), apiError.getStatus());
+
     }
 }

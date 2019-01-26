@@ -15,7 +15,6 @@ public class ApiError {
 
     private HttpStatus status;
     private String message;
-//    private List<String> errors;
 
     public ApiError() {
         super();
@@ -25,15 +24,7 @@ public class ApiError {
         super();
         this.status = status;
         this.message = message;
-     //   this.errors = errors;
     }
-
-//    public ApiError(HttpStatus status, String message) {
-//        super();
-//        this.status = status;
-//        this.message = message;
-//      //  errors = Collections.singletonList(error);
-//    }
 
     public HttpStatus getStatus() {
         return status;
@@ -50,17 +41,5 @@ public class ApiError {
     public void setMessage(final String message) {
         this.message = message;
     }
-
-//    public List<String> getErrors() {
-//        return errors;
-//    }
-
-//    public void setErrors(final List<String> errors) {
-//        this.errors = errors;
-//    }
-
-//    public void setError(final String error) {
-//        errors = Collections.singletonList(error);
-//    }
 
 }

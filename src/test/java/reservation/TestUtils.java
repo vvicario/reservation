@@ -4,6 +4,9 @@ import reservation.domain.Reservation;
 
 import java.time.LocalDate;
 
+/**
+ * @author vvicario
+ */
 public abstract class TestUtils {
 
     protected static final String EMAIL = "vvicario@test.com";

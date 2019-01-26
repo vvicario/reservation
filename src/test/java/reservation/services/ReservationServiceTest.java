@@ -14,19 +14,19 @@ import reservation.domain.Reservation;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Stream;
 
+/**
+ * @author vvicario
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ReservationApplication.class}, loader = AnnotationConfigContextLoader.class)
 public class ReservationServiceTest extends TestUtils {
 
     @Autowired
-    ReservationServiceImpl service;
+    private ReservationServiceImpl service;
 
     @Test
     public void testFindAvailableDates()

@@ -6,6 +6,9 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * @author vvicario
+ */
 public class UtilsTest {
 
     @Test

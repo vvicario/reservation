@@ -8,6 +8,9 @@ import org.junit.rules.ExpectedException;
 
 import java.time.LocalDate;
 
+/**
+ * @author vvicario
+ */
 public class ReservationValidatorTest extends TestUtils {
 
     private ReservationValidator validator;

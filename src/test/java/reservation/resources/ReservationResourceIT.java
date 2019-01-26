@@ -18,6 +18,9 @@ import reservation.domain.Reservation;
 
 import java.time.LocalDate;
 
+/**
+ * @author vvicario
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ReservationApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ReservationResourceIT extends TestUtils {
