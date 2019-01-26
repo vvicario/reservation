@@ -1,7 +1,7 @@
 ## Backend of Campiste Reservation
 
 ## Local Development
-* TheMaven 3.5
+* Maven 3.5
 * Java 8
 * Spring Boot: https://spring.io/projects/spring-boot
 
