@@ -16,16 +16,14 @@ import java.time.LocalDate;
  * @author vvicario
  */
 @Entity
-// EndA <= StartB or StartA >= EndB
+//  NOT (EndA <= StartB or StartA >= EndB) ; “Overlap”)
 @NamedQueries({
         @NamedQuery(name = "Reservation.checkForDateRangeOverlap",
-                query = "select count(r.id) from Reservation r where r.departureDate >= :arrivalDate or " +
-                        "r.arrivalDate <= :departureDate ",
-                lockMode = LockModeType.WRITE),
+                query = "select count(r.id) from Reservation r where NOT (r.departureDate <= :arrivalDate or " +
+                        "r.arrivalDate >= :departureDate) "),
         @NamedQuery(name = "Reservation.checkForDateRangeOverlapUpdate",
-                query = "select count(r.id) from Reservation r where r.identifier != :identifier and (r.departureDate >= :arrivalDate or " +
-                        "r.arrivalDate <= :departureDate) ",
-                lockMode = LockModeType.WRITE)
+                query = "select count(r.id) from Reservation r where r.identifier != :identifier and NOT (r.departureDate <= :arrivalDate or " +
+                        "r.arrivalDate >= :departureDate) ")
 })
 public class Reservation {
 

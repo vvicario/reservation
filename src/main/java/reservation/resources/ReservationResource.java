@@ -43,16 +43,15 @@ public class ReservationResource {
     /**
      * Create a reservation for the specified information
      * @param reservation
-     * @param ucb
      * @return
      * @throws Exception
      */
     @PostMapping
-    public ResponseEntity create(@RequestBody @Valid Reservation reservation, UriComponentsBuilder ucb) throws Exception {
+    public ResponseEntity create(@RequestBody @Valid Reservation reservation) throws Exception {
         validator.validate(reservation);
-        reservation = reservationService.create(reservation).get();
+        CompletableFuture<Reservation> reservationCompletableFuture = reservationService.create(reservation);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path(
-                "/{id}").buildAndExpand(reservation.getIdentifier()).toUri();
+                "/{id}").buildAndExpand(reservationCompletableFuture.get().getIdentifier()).toUri();
         return ResponseEntity.created(location).build();
     }
 

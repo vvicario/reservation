@@ -1,5 +1,6 @@
 package reservation.resources;
 
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import reservation.dto.ApiError;
 import javassist.NotFoundException;
 import org.slf4j.Logger;

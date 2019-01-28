@@ -1,5 +1,6 @@
 package reservation.validators;
 
+import org.skyscreamer.jsonassert.JSONAssert;
 import reservation.TestUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -7,6 +8,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.time.LocalDate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author vvicario
@@ -83,5 +86,16 @@ public class ReservationValidatorTest extends TestUtils {
         exception.expectMessage(String.format(ReservationValidator.ERROR_MESSAGE_TO_DATE, LocalDate.now().plusMonths(1)));
         validator.validateDateRange(arrivalDate, departureDate);
     }
+    @Test
+    public void givenText_whenSimpleRegexMatchesTwice_thenCorrect() {
+        String test = "CCCCTA";
+        Pattern pattern = Pattern.compile("CCC");
+        Matcher matcher = pattern.matcher(test);
+        int matches = 0;
+        while (matcher.find()) {
+            matches++;
+        }
 
+   //     JSONAssert.assertEquals(matches, 2);
+    }
 }

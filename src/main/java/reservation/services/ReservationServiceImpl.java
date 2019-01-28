@@ -65,9 +65,12 @@ public class ReservationServiceImpl implements ReservationService {
             throwNotFoundException();
         }
         try {
-            if (!isOverlappingUpdate(reservation)) {
-                reservation.setId(existentReservation.getId());
-                reservationRepository.save(reservation);
+            existentReservation.setArrivalDate(reservation.getArrivalDate());
+            existentReservation.setDepartureDate(reservation.getDepartureDate());
+            existentReservation.setUserFullName(reservation.getUserFullName());
+            existentReservation.setUserEmail(reservation.getUserEmail());
+            if (!isOverlappingUpdate(existentReservation)) {
+                reservationRepository.save(existentReservation);
             } else {
                 throwConcurrentModificationException();
             }
